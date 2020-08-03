@@ -1,10 +1,11 @@
 import { Schema, model, Document } from 'mongoose'
-import { hash } from "bcryptjs";
+import { hash, compare } from "bcryptjs";
 
 export interface IUser extends Document {
     username: string,
     email: string,
     password: string,
+    comparePassWord(pass: string): boolean
 }
 
 const userSchema: Schema = new Schema({
@@ -40,6 +41,10 @@ userSchema.methods.toJSON = function() {
     const objectUser = user.toObject();
     delete objectUser.password;
     return objectUser;
+}
+
+userSchema.methods.comparePassWord = async function (pass: string): Promise<boolean> {
+    return await compare(pass, this.password)
 }
 
 export default model<IUser>('User', userSchema)

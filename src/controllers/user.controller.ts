@@ -1,12 +1,11 @@
 import { Request, Response } from 'express'
 import UserModel, { IUser } from '../models/user.model'
 import { sign } from 'jsonwebtoken'
-import { compare } from 'bcryptjs'
 
 export const signup = async (req: Request, res: Response): Promise<Response> => {
     try {
         const { username, email, password } = req.body;
-        const userSignup = new UserModel({ username, email, password });
+        const userSignup: IUser = new UserModel({ username, email, password });        
         const user: IUser = await userSignup.save();
 
         return res.json({
@@ -31,7 +30,8 @@ export const signin = async (req: Request, res: Response): Promise<Response> => 
             err: true
         })
     }
-    const isMatch: Boolean = await compare(password, user.password)
+    
+    const isMatch: Boolean = await user.comparePassWord(password)
     if (!isMatch) {
         return res.json({
             mes: "Invalid password",
